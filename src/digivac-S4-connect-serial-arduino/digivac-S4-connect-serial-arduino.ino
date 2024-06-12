@@ -2,10 +2,11 @@
 
 // Define the struct to hold sensor commands
 struct SensorCommands {
-  const char* readCombinedPressure = "@254P?\\";
-  const char* readPiezoPressure = "@254P?PZ\\";
-  const char* readPiraniPressure = "@254P?MP\\";
-  const char* quickDataAcquisition = "@254Q?\\";
+  const char* initS4Connect = "@254S4-Connect\\"; // Assumed command to enter S4-Connect mode
+  const char* readCombinedPressure = "@253P?\\";
+  const char* readPiezoPressure = "@253P?PZ\\";
+  const char* readPiraniPressure = "@253P?MP\\";
+  const char* quickDataAcquisition = "@253Q?\\";
 };
 
 // Instantiate the command struct
@@ -52,6 +53,18 @@ void setup() {
 
   // Initialize RS232 Serial communication
   Serial1.begin(9600); // Adjust the baud rate according to your sensor's specification
+
+  // Put the sensor in S4-Connect mode using the global address
+  Serial.println("Initializing sensor to S4-Connect mode...");
+  String initResponse = communicateWithSensor(commands.initS4Connect);
+  Serial.println("Initialization Response: " + initResponse);
+
+  // Check if the initialization was successful
+  if (initResponse.indexOf("ACK") == -1) {
+    Serial.println("Failed to enter S4-Connect mode. Check the initialization command.");
+  } else {
+    Serial.println("Successfully entered S4-Connect mode.");
+  }
 }
 
 void loop() {
